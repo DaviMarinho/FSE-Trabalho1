@@ -1,5 +1,9 @@
 # FSE-Trabalho1
 
+# Video disponível em:
+
+https://youtu.be/p1Qv5E5L_h0
+
 ## Execução
 
 Há 1 servidor central e vários servidores distribuídos. Sendo assim, o programa será executado para cada servidor, em terminais separados.
