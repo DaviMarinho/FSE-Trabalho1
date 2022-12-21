@@ -19,7 +19,18 @@ Para os servidores distribuídos, o comando deve receber o arquivo de configura�
 ```
 bin/bin configuracao_sala_exemplo.json
 ```
-É necessário trocar o `<n>` pelo número da sala.
+Podendo ser alterado o nome do arquivo de configuração.
+
+No arquivo de configuração pode ser alterado os valores:
+
+```
+ip_servidor_central
+porta_servidor_central
+ip_servidor_distribuido
+porta_servidor_distribuido
+nome
+gpio
+```
 
 ## Comandos
 
