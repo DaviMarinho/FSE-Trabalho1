@@ -6,11 +6,6 @@ typedef struct {
   float umidade;
 } DHT22;
 
-#define SERVER_DISTRIBUTED_IP "164.41.98.16"
-#define SERVER_CENTRAL_PORT 10741 
-#define SERVER_DISTRIBUTED_PORT 10741
-
-
 void acionaDistribuido();
 void *recebeDistribuido();
 void leTempUmidade();

@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 #include "leJSON.h"
 #include "cJSON.h"
 
@@ -15,84 +14,83 @@ int dispositivosSaida[5];
 
 
 JSONConfig leJSONConfig(const char* nomeArquivo) {
+  const cJSON *item = NULL;
+  const cJSON *outputs = NULL;
+  const cJSON *inputs = NULL;
+  const cJSON *nomeSala = NULL;
 
-
-    const cJSON *item = NULL;
-    const cJSON *outputs = NULL;
-    const cJSON *inputs = NULL;
-    const cJSON *nomeAndar = NULL;
-
-    // Abrindo arquivo JSON
-    char json_buffer[2000];
-    FILE *arq = fopen(nomeArquivo,"r");
-    fread(json_buffer, 2000, 1, arq);
+  // Abrindo arquivo JSON
+  char json_buffer[2000];
+  FILE *arq = fopen(nomeArquivo,"r");
+  fread(json_buffer, 2000, 1, arq);
 	fclose(arq);
 
-    cJSON *devices = cJSON_Parse(json_buffer);
-    if (devices == NULL)
-    {
-        const char *error_ptr = cJSON_GetErrorPtr();
-        if (error_ptr != NULL)
-        {
-            fprintf(stderr, "Error before: %s\n", error_ptr);
-        }
-        return config2;
-    }
+  cJSON *devices = cJSON_Parse(json_buffer);
+  if (devices == NULL)
+  {
+      const char *error_ptr = cJSON_GetErrorPtr();
+      if (error_ptr != NULL)
+      {
+          fprintf(stderr, "Error before: %s\n", error_ptr);
+      }
+      return config2;
+  }
 
-    nomeAndar = cJSON_GetObjectItemCaseSensitive(devices, "nome");
-    printf("Analisando \"%s\"\n", nomeAndar->valuestring);
-    cJSON *ip_json = cJSON_GetObjectItemCaseSensitive(devices, "ip_servidor_central");
-    strcpy(config2.ipCentral, ip_json->valuestring);
+  nomeSala = cJSON_GetObjectItemCaseSensitive(devices, "nome");
+  printf("Analisando \"%s\"\n", nomeSala->valuestring);
+  cJSON *ip_json = cJSON_GetObjectItemCaseSensitive(devices, "ip_servidor_central");
+  strcpy(config2.ipCentral, ip_json->valuestring);
 
-    cJSON *porta_json = cJSON_GetObjectItemCaseSensitive(devices, "porta_servidor_distribuido");
-    config2.portaDistribuido = porta_json->valueint;
+  cJSON *porta_json_central = cJSON_GetObjectItemCaseSensitive(devices, "porta_servidor_central");
+  config2.portaCentral = porta_json_central->valueint;
 
-    printf("IP: %s e Porta: %d\n", config2.ipCentral, config2.portaDistribuido);
+  cJSON *porta_json_ip_distribuido = cJSON_GetObjectItemCaseSensitive(devices, "ip_servidor_distribuido");
+  strcpy(config2.ipDistribuido, porta_json_ip_distribuido->valuestring);
 
-    inputs = cJSON_GetObjectItemCaseSensitive(devices, "inputs");
+  cJSON *porta_json_porta_distribuido = cJSON_GetObjectItemCaseSensitive(devices, "porta_servidor_distribuido");
+  config2.portaDistribuido = porta_json_porta_distribuido->valueint;
 
-    qtdeDispositivosEntrada = 0;
-    cJSON_ArrayForEach(item, inputs)
-    {
+  printf("IP: %s e Porta: %d\n", config2.ipCentral, config2.portaDistribuido);
 
-        cJSON *tag = cJSON_GetObjectItemCaseSensitive(item, "tag");
-        cJSON *gpio = cJSON_GetObjectItemCaseSensitive(item, "gpio");
+  inputs = cJSON_GetObjectItemCaseSensitive(devices, "inputs");
 
-        int len = (strlen(tag->valuestring) + 13);
+  qtdeDispositivosEntrada = 0;
+  cJSON_ArrayForEach(item, inputs){
+    cJSON *tag = cJSON_GetObjectItemCaseSensitive(item, "tag");
+    cJSON *gpio = cJSON_GetObjectItemCaseSensitive(item, "gpio");
 
-        printIgual(len);
-        printf("%s na gpio %d |\n", tag->valuestring, gpio->valueint);
-        printIgual(len);
-        printf("\n");
+    int len = (strlen(tag->valuestring) + 13);
 
-        dispositivosEntrada[qtdeDispositivosEntrada] = gpio->valueint;
-        qtdeDispositivosEntrada += 1;
-    }
+    printIgual(len);
+    printf("%s na gpio %d |\n", tag->valuestring, gpio->valueint);
+    printIgual(len);
+    printf("\n");
 
+    dispositivosEntrada[qtdeDispositivosEntrada] = gpio->valueint;
+    qtdeDispositivosEntrada += 1;
 
-    outputs = cJSON_GetObjectItemCaseSensitive(devices, "outputs");
-
-    qtdeDispositivosSaida = 0;
-    cJSON_ArrayForEach(item, outputs)
-    {
-
-        cJSON *tag = cJSON_GetObjectItemCaseSensitive(item, "tag");
-        cJSON *gpio = cJSON_GetObjectItemCaseSensitive(item, "gpio");
-
-        int len = (strlen(tag->valuestring) + 13);
-
-        printIgual(len);
-        printf("%s na gpio %d |\n", tag->valuestring, gpio->valueint);
-        printIgual(len);
-        printf("\n");
-
-        dispositivosSaida[qtdeDispositivosSaida] = gpio->valueint;
-        qtdeDispositivosSaida += 1;
-    }
+  }
 
 
-    return config2;
+  outputs = cJSON_GetObjectItemCaseSensitive(devices, "outputs");
 
+  qtdeDispositivosSaida = 0;
+  cJSON_ArrayForEach(item, outputs) {
+    cJSON *tag = cJSON_GetObjectItemCaseSensitive(item, "tag");
+    cJSON *gpio = cJSON_GetObjectItemCaseSensitive(item, "gpio");
+
+    int len = (strlen(tag->valuestring) + 13);
+
+    printIgual(len);
+    printf("%s na gpio %d |\n", tag->valuestring, gpio->valueint);
+    printIgual(len);
+    printf("\n");
+
+    dispositivosSaida[qtdeDispositivosSaida] = gpio->valueint;
+    qtdeDispositivosSaida += 1;
+  }
+
+  return config2;
 }
 
 int *getDispositivosEntrada(){
@@ -111,7 +109,19 @@ int *getDispositivosSaida(){
   return dispositivosSaida;
 }
 
-int getPorta(){
+char *getIpCentral(){
+  return config2.ipCentral;
+}
+
+int getPortaCentral(){
+  return config2.portaCentral;
+}
+
+char *getIpDistribuido(){
+  return config2.ipDistribuido;
+}
+
+int getPortaDistribuido(){
   return config2.portaDistribuido;
 }
 

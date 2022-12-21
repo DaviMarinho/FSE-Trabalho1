@@ -60,7 +60,7 @@ int main(int argc, const char * argv[]) {
 		return -1;
 	}
 
-    int porta = getPorta();
+    int porta = getPortaDistribuido();
 
     pthread_create(&comunicacao, NULL, recebeCentral, &porta);
     pthread_create(&gpio, NULL, handleGPIO, NULL);

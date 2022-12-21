@@ -7,6 +7,7 @@
 
 #include "dht.h"
 #include "gpio.h"
+#include "leJSON.h"
 
 void* recebeCentral(void *porta) {
 
@@ -56,12 +57,17 @@ void* recebeCentral(void *porta) {
     if (command == 1) {
       int item;
       int status;
+      int codigoGPIO;
+
       sscanf(buffer, "%d %d %d", &command, &item, &status);
+
+      codigoGPIO = codigoDispoParaGPIO(item);
+
       printf("====================================================\n");
-      printf("| Requisicao para alterar estado do dispositivo %d |\n", item);
+      printf("| Requisicao para alterar estado do dispositivo %d |\n", codigoGPIO);
       printf("====================================================\n");
       printf("\n");
-      ativaDesativaDispositivo(item, status);
+      ativaDesativaDispositivo(codigoGPIO, status);
       char buf[2];
       snprintf(buf, 2, "%d", 1);
       int size = strlen(buf);
@@ -100,9 +106,20 @@ void* recebeCentral(void *porta) {
 }
 
 
-void enviaCentral(char *message) {
-  
+void enviaCentral(int message) {
+  char *ipCentral;
+  int portaCentral;
+  char *ipDistribuido;
+  int portaDistribuido;
+  int ipParte1, ipParte2, ipParte3, ipParte4;
+  char ipFake[13];
+
 	struct sockaddr_in client;
+
+  ipCentral = getIpCentral();
+  portaCentral = getPortaCentral();
+  ipDistribuido = getIpDistribuido();
+  portaDistribuido = getPortaDistribuido();
 
   int socketid = socket(AF_INET, SOCK_STREAM, 0);
   if (socketid == -1) {
@@ -111,8 +128,8 @@ void enviaCentral(char *message) {
   }
 
   client.sin_family = AF_INET;
-  client.sin_addr.s_addr = inet_addr("164.41.98.26");
-  client.sin_port = htons(10741);
+  client.sin_addr.s_addr = inet_addr(ipCentral);
+  client.sin_port = htons(portaCentral);
 
   while(connect(socketid, (struct sockaddr*) &client, sizeof(client)) < 0){
     printf("==============================================================\n");
@@ -122,13 +139,44 @@ void enviaCentral(char *message) {
     sleep(1);
   }
 
-  int size = strlen(message);
-  if (send(socketid, message, size, 0) != size) {
+  // int size = strlen(message);
+  // if (send(socketid, message, size, 0) != size) {
+  //   printf("========================\n");
+  //   printf("| Erro: falha no envio |\n");
+  //   printf("========================\n");
+  //   printf("\n");
+  //   exit(1);
+  // }
+
+  strcpy(ipFake, ipDistribuido);
+
+  ipParte1 = atoi(strtok(ipFake, "."));
+  ipParte2 = atoi(strtok(NULL, "."));
+  ipParte3 = atoi(strtok(NULL, "."));
+  ipParte4 = atoi(strtok(NULL, "."));
+  
+  char buf[50];
+  snprintf(buf, 50, "%d %d %d %d %d %d", message, ipParte1, ipParte2, ipParte3, ipParte4, portaDistribuido);
+
+  int sizeBuf = strlen(buf);
+  if (send(socketid, buf, sizeBuf, 0) != sizeBuf) {
     printf("========================\n");
     printf("| Erro: falha no envio |\n");
     printf("========================\n");
     printf("\n");
     exit(1);
   }
+
   close(socketid);
+}
+
+int codigoDispoParaGPIO(int numDispositivo){
+
+  int codigoGPIO;
+  int * dispositivosSaida;
+  dispositivosSaida = getDispositivosSaida();
+
+  codigoGPIO = dispositivosSaida[numDispositivo];
+
+  return codigoGPIO;
 }

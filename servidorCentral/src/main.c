@@ -11,6 +11,7 @@ pthread_t recebe;
 // pthread_t tempUmi;
 
 void encerraPrograma() {
+    printf("\n");
     printf("=================\n");
     printf("| Encerrando... |\n");
     printf("=================\n");

@@ -1,4 +1,4 @@
-# FSE-Trabalho2
+# FSE-Trabalho1
 
 ## Execução
 
@@ -7,7 +7,7 @@ Há 1 servidor central e vários servidores distribuídos. Sendo assim, o progra
 Para compilar o código de um servidor, execute no diretório raiz (diretório servidorCentral ou servidorDistribuido) o comando
 
 ```
-make
+make ou make all
 ```
 
 Para o servidor central, agora basta executar:
@@ -17,7 +17,7 @@ bin/bin
 
 Para os servidores distribuídos, o comando deve receber o arquivo de configuração. Por exemplo, para o servidor distribuído de cada sala, seria:
 ```
-bin/bin configuracao_sala_0<n>.json
+bin/bin configuracao_sala_exemplo.json
 ```
 É necessário trocar o `<n>` pelo número da sala.
 

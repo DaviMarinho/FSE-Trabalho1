@@ -26,47 +26,46 @@ int gpioToPin( int value ){
     return ( index == 64 ? -1 : index );
 }
 
-void ativaDesativaDispositivo(int item, int status) {
-  //used to set a device, such as a lamp, on or off
+void ativaDesativaDispositivo(int codigoGPIO, int status) {
   printf("===============================\n");
-  printf("| Alterando estado da gpio %d |\n", item);
+  printf("| Alterando estado da gpio %d |\n", codigoGPIO);
   printf("===============================\n");
   printf("\n");
-  
-  int wiringPIpin = gpioToPin(item);
+
+  int wiringPIpin = gpioToPin(codigoGPIO);
   pinMode(wiringPIpin, OUTPUT);
   digitalWrite(wiringPIpin, status);
 }
 
-void presAndarUm(void) {
-  char* message = "1";
+void sensorPresenca(void) {
+  int message = 1;
   enviaCentral(message);
-  printf("===========================\n");
-  printf("| Presença primeiro andar |\n");
-  printf("===========================\n");
+  printf("======================\n");
+  printf("| Sensor de Presença |\n");
+  printf("======================\n");
   printf("\n");
 }
 
-void fumacaAndarUm(void) {
-  char* message = "2";
+void sensorFumaca(void) {
+  int message = 2;
   enviaCentral(message);
-  printf("=========================\n");
-  printf("| Fumaça primeiro andar |\n");
-  printf("=========================\n");
+  printf("====================\n");
+  printf("| Sensor de Fumaça |\n");
+  printf("====================\n");
   printf("\n");
 }
 
-void Janela101(void) {
-  char* message = "3";
+void sensorJanela(void) {
+  int message = 3;
   enviaCentral(message);
-  printf("=============================\n");
-  printf("| Janela 101 primeiro andar |\n");
-  printf("=============================\n");
+  printf("====================\n");
+  printf("| Sensor da Janela |\n");
+  printf("====================\n");
   printf("\n");
 }
 
-void portaEntrada(void) {
-  char* message = "4";
+void sensorPorta(void) {
+  int message = 4;
   enviaCentral(message);
   printf("===========================\n");
   printf("| Sensor porta de entrada |\n");
@@ -95,31 +94,16 @@ void* handleGPIO() {
       switch (gpioPort)
       {
         case 7:
-         wiringPiISR(wiringPIpin, INT_EDGE_BOTH, presAndarUm);
+         wiringPiISR(wiringPIpin, INT_EDGE_BOTH, sensorPresenca);
          break;
         case 1:
-         wiringPiISR(wiringPIpin, INT_EDGE_BOTH, fumacaAndarUm);
+         wiringPiISR(wiringPIpin, INT_EDGE_BOTH, sensorFumaca);
          break;
         case 12:
-         wiringPiISR(wiringPIpin, INT_EDGE_BOTH, Janela101);
+         wiringPiISR(wiringPIpin, INT_EDGE_BOTH, sensorJanela);
          break;
-        // case 6:
-        //  wiringPiISR(wiringPIpin, INT_EDGE_BOTH, Janela102);
-        //  break;
-        // case 26:
-        //  wiringPiISR(wiringPIpin, INT_EDGE_BOTH, presencaTerreo);
-        //  break;
-        // case 23:
-        //  wiringPiISR(wiringPIpin, INT_EDGE_BOTH, fumacaTerreo);
-        //  break;
-        // case 9:
-        //  wiringPiISR(wiringPIpin, INT_EDGE_BOTH, janelaT01);
-        //  break;
-        // case 11:
-        //  wiringPiISR(wiringPIpin, INT_EDGE_BOTH, janelaT02);
-        //  break;
         case 16:
-         wiringPiISR(wiringPIpin, INT_EDGE_BOTH, portaEntrada);
+         wiringPiISR(wiringPIpin, INT_EDGE_BOTH, sensorPorta);
          break;
       default:
         break;
